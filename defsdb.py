@@ -22,7 +22,7 @@ class BancoDados:
         cursor = self.conexao.cursor()
 
         def criar_tabelas(conexao):
-            # Cria um cursor para executar comandos SQL
+            # Cria um cursor para execute comandos SQL
             cursor = conexao.cursor()
 
             # Cria a tabela usuarios
