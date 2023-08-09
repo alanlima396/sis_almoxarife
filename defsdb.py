@@ -19,7 +19,7 @@ class BancoDados:
             raise ValueError("A conexão com o banco de dados não foi estabelecida.")
 
         # Cria um cursor para executar comandos SQL
-        cursor = self.conexao.cursor()
+        #cursor = self.conexao.cursor()
 
         def criar_tabelas(conexao):
             # Cria um cursor para execute comandos SQL
@@ -68,11 +68,19 @@ class BancoDados:
                 )
             ''')
 
-            # Salva as alterações
-            conexao.commit()
 
-        # Salva as alterações
+            # Salva as alterações
+            self.conexao.commit()
+
+    def adicionar_usuario(self, nome, email):
+        cursor = self.conexao.cursor()
+
+        cursor.execute('''
+            INSERT INTO usuarios (nome, email) VALUES (?, ?)
+        ''', (nome, email))
+
         self.conexao.commit()
+        print('Dados Registrados com Sucesso!')
 
     def setup(self):
         self.conectar()
@@ -80,6 +88,6 @@ class BancoDados:
         self.desconectar()
 
 
-if __name__ == '__main__':
-    bd = BancoDados()
-    bd.setup()
+  #  if __name__ == '__main__':
+   #     bd = BancoDados()
+    #    bd.setup()

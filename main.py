@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from defsdb import *
 
 
 class ProductListWidget(ttk.Treeview):
@@ -37,8 +38,26 @@ def cadastrar_funcionario():
     entry_email = tk.Entry(win, width=50)
     entry_email.pack()
 
-    btn_register = tk.Button(win, text="Salvar")
-    btn_register.pack(pady=20)
+    banco = BancoDados()
+    banco.conectar()
+
+    def salvar_usuario():
+        nome = entry_nome.get().upper()
+        email = entry_email.get().lower()
+
+        banco.adicionar_usuario(nome, email)
+        entry_nome.delete(0, tk.END)
+        entry_email.delete(0, tk.END)
+
+    def exit_topLevel():
+        banco.desconectar()
+        win.destroy()
+
+    btn_register = tk.Button(win, text="Salvar", command=lambda: salvar_usuario(), width=10)
+    btn_register.place(x=275, y=110)
+
+    btn_sair = tk.Button(win, text="Sair", command=lambda: exit_topLevel(), width=10)
+    btn_sair.place(x=275, y=150)
 
 
 if __name__ == "__main__":
