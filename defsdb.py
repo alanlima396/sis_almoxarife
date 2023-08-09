@@ -41,7 +41,8 @@ class BancoDados:
                     nome TEXT,
                     descricao TEXT,
                     status TEXT,
-                    estoque INTEGER
+                    estoque INTEGER,
+                    portador VARCHAR(30)
                 )
             ''')
 
@@ -81,6 +82,16 @@ class BancoDados:
 
         self.conexao.commit()
         print('Dados Registrados com Sucesso!')
+
+    def adicionar_produto(self, nome, descricao,status, quantia, portador):
+        cursor = self.conexao.cursor()
+
+        cursor.execute('''
+            INSERT INTO itens (nome, ,status, estoque) VALUES (?, ?, ?)
+        ''', (nome, status, quantia))
+
+        self.conexao.commit()
+        print('Produto Registrado com Sucesso!')
 
     def setup(self):
         self.conectar()
