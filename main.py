@@ -75,7 +75,7 @@ if __name__ == "__main__":
     root.geometry("600x300")
 
     style = ttk.Style()
-    style.theme_use("clam")
+    style.theme_use("winnative")
 
     btn_cadastrar = ttk.Button(root, text="cadastrar funcionário", command=lambda: cadastrar_funcionario())
     btn_cadastrar.pack(padx=30, pady=20)

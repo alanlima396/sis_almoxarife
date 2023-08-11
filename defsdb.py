@@ -18,60 +18,57 @@ class BancoDados:
         if not self.conexao:
             raise ValueError("A conexão com o banco de dados não foi estabelecida.")
 
-        # Cria um cursor para executar comandos SQL
-        #cursor = self.conexao.cursor()
 
-        def criar_tabelas(conexao):
-            # Cria um cursor para execute comandos SQL
-            cursor = conexao.cursor()
+        # Cria um cursor para execute comandos SQL
+        cursor = self.conexao.cursor()
 
-            # Cria a tabela usuarios
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS usuarios (
-                    id INTEGER PRIMARY KEY,
-                    nome TEXT,
-                    email TEXT
-                )
-            ''')
+        # Cria a tabela usuarios
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS usuarios (
+                id INTEGER PRIMARY KEY,
+                nome TEXT,
+                email TEXT
+            )
+        ''')
 
-            # Cria a tabela itens
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS itens (
-                    id INTEGER PRIMARY KEY,
-                    nome TEXT,
-                    descricao TEXT,
-                    status TEXT,
-                    estoque INTEGER,
-                    portador VARCHAR(30)
-                )
-            ''')
+        # Cria a tabela itens
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS itens (
+                id INTEGER PRIMARY KEY,
+                nome TEXT,
+                descricao TEXT,
+                status TEXT,
+                estoque INTEGER,
+                portador VARCHAR(30)
+            )
+        ''')
 
-            # Cria a tabela funcionarios
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS funcionarios (
-                    id INTEGER PRIMARY KEY,
-                    nome TEXT,
-                    cargo TEXT
-                )
-            ''')
+        # Cria a tabela funcionarios
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS funcionarios (
+                id INTEGER PRIMARY KEY,
+                nome TEXT,
+                cargo TEXT
+            )
+        ''')
 
-            # Cria a tabela alocacoes
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS alocacoes (
-                    id INTEGER PRIMARY KEY,
-                    funcionario_id INTEGER,
-                    item_id INTEGER,
-                    data_alocacao TEXT,
-                    data_devolucao TEXT,
-                    quantidade_alocada INTEGER,
-                    FOREIGN KEY (funcionario_id) REFERENCES funcionarios (id),
-                    FOREIGN KEY (item_id) REFERENCES itens (id)
-                )
-            ''')
+        # Cria a tabela alocacoes
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS alocacoes (
+                id INTEGER PRIMARY KEY,
+                funcionario_id INTEGER,
+                item_id INTEGER,
+                data_alocacao TEXT,
+                data_devolucao TEXT,
+                quantidade_alocada INTEGER,
+                FOREIGN KEY (funcionario_id) REFERENCES funcionarios (id),
+                FOREIGN KEY (item_id) REFERENCES itens (id)
+            )
+        ''')
 
 
-            # Salva as alterações
-            self.conexao.commit()
+        # Salva as alterações
+        self.conexao.commit()
 
     def adicionar_usuario(self, nome, email):
         cursor = self.conexao.cursor()
@@ -87,8 +84,8 @@ class BancoDados:
         cursor = self.conexao.cursor()
 
         cursor.execute('''
-            INSERT INTO itens (nome, ,status, estoque) VALUES (?, ?, ?)
-        ''', (nome, status, quantia))
+            INSERT INTO itens (nome, descricao, status, estoque, portador) VALUES (?, ?, ?)
+        ''', (nome, descricao, status, quantia, portador))
 
         self.conexao.commit()
         print('Produto Registrado com Sucesso!')
@@ -99,6 +96,6 @@ class BancoDados:
         self.desconectar()
 
 
-  #  if __name__ == '__main__':
-   #     bd = BancoDados()
-    #    bd.setup()
+if __name__ == '__main__':
+    bd = BancoDados()
+    bd.setup()

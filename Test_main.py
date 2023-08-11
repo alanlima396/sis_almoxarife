@@ -26,7 +26,7 @@ class Sistema:
         self.root.geometry("600x300")
 
         self.style = ttk.Style()
-        self.style.theme_use("clam")
+        self.style.theme_use("winnative")
 
         self.banco = BancoDados()
         self.banco.conectar()
