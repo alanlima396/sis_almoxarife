@@ -1,8 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from defsdb import BancoDados
-import datetime
-
+from utilitarios import *
 
 class Produto:
     def __init__(self, nome, status, quantia, portador, data_registro):
@@ -44,34 +43,37 @@ class Sistema:
         btn_cadastrar_produto = ttk.Button(self.root, text="Cadastrar Produto", command=self.cadastrar_produto)
         btn_cadastrar_produto.pack(pady=20)
 
+        btn_cadastrar_status = ttk.Button(self.root, text='Cadastar Status', command=self.NewStatus)
+        btn_cadastrar_status.pack()
+
     def cadastrar_funcionario(self):
         win = tk.Toplevel()
         win.title("Cadastrar Funcionário")
         win.geometry("600x400")
 
-        label_nome = tk.Label(win, text="Usuário:")
+        label_nome = tk.Label(win, text="Funcionário:")
         label_nome.pack()
         entry_nome = tk.Entry(win, width=50)
         entry_nome.pack()
 
-        label_email = tk.Label(win, text="Email")
-        label_email.pack()
-        entry_email = tk.Entry(win, width=50)
-        entry_email.pack()
+        label_cargo = tk.Label(win, text="cargo")
+        label_cargo.pack()
+        entry_cargo = tk.Entry(win, width=50)
+        entry_cargo.pack()
 
-        def salvar_usuario():
+        def salvar_funcionario():
             nome = entry_nome.get().upper()
-            email = entry_email.get().lower()
+            cargo = entry_cargo.get().lower()
 
-            self.banco.adicionar_usuario(nome, email)
+            self.banco.adicionar_funcioanrio(nome, cargo)
             entry_nome.delete(0, tk.END)
-            entry_email.delete(0, tk.END)
+            entry_cargo.delete(0, tk.END)
 
         def exit_toplevel():
             self.banco.desconectar()
             win.destroy()
 
-        btn_register = tk.Button(win, text="Salvar", command=lambda: salvar_usuario(), width=10)
+        btn_register = tk.Button(win, text="Salvar", command=lambda: salvar_funcionario(), width=10)
         btn_register.place(x=275, y=110)
 
         btn_sair = tk.Button(win, text="Sair", command=lambda: exit_toplevel(), width=10)
@@ -102,17 +104,14 @@ class Sistema:
         entry_portador = tk.Entry(win, width=50)
         entry_portador.pack()
 
-        label_data_registro = tk.Label(win, text="Data de Registro (YYYY-MM-DD)")
-        label_data_registro.pack()
-        entry_data_registro = tk.Entry(win, width=50)
-        entry_data_registro.pack()
+
 
         def salvar_produto():
             nome = entry_nome.get()
             status = entry_status.get()
             quantia = int(entry_quantia.get())
             portador = entry_portador.get()
-            data_registro = entry_data_registro.get()
+            data_registro = data_now()
 
             novo_produto = Produto(nome, status, quantia, portador, data_registro)
             self.produtos_cadastrados.append(novo_produto)
@@ -123,7 +122,6 @@ class Sistema:
             entry_status.delete(0, tk.END)
             entry_quantia.delete(0, tk.END)
             entry_portador.delete(0, tk.END)
-            entry_data_registro.delete(0, tk.END)
 
         btn_register = tk.Button(win, text="Salvar", command=lambda: salvar_produto(), width=10)
         btn_register.place(x=275, y=250)
@@ -142,6 +140,25 @@ class Sistema:
         for produto in self.produtos_cadastrados:
             tree.insert("", "end", values=(produto.nome, produto.status, produto.portador))
 
+
+    def NewStatus(self):
+        win = tk.Toplevel()
+        win.title("Cadastrar Status")
+        win.geometry("400x200")
+
+        lb_name = tk.Label(win, text='Novo Status:')
+        lb_name.pack()
+
+        et_status = tk.Entry(win, width=50)
+        et_status.pack()
+
+        def salvar_status():
+            new = et_status.get()
+            self.banco.adicionar_status(new)
+
+            et_status.delete(0, tk.END)
+        btn_saveStatus = ttk.Button(win, command=salvar_status())
+        btn_saveStatus.pack()
 
 if __name__ == "__main__":
     root = tk.Tk()

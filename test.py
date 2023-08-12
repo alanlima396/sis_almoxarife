@@ -1,5 +1,4 @@
-from tkinter import ttk
+import os
 
-v = ttk.Style()
-t = v.theme_names()
-print(t)
+v = os.path.exists("almocxarifado.db")
+print(v)
