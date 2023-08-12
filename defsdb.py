@@ -89,11 +89,10 @@ class BancoDados:
                 INSERT INTO status_itens (nome) VALUES ('Indisponível')
             ''')
 
-
             # Salva as alterações
             self.conexao.commit()
         except sqlite3.Error as sqlite_error:
-            print('Erro ao interagir com o SQLite:', sqlite_error)
+            notificacao(f'Erro ao interagir com o SQLite: {sqlite_error}', som=2)
         except Exception as general_error:
             print('Erro geral durante a criação do banco de dados:', general_error)
         else:
@@ -114,7 +113,6 @@ class BancoDados:
         except Exception as e:
             print('Erro ao registrar usuário:', e)
 
-
     def adicionar_funcioanrio(self, nome, cargo):
         cursor = self.conexao.cursor()
         cursor.execute('''
@@ -122,7 +120,7 @@ class BancoDados:
         ''', (nome, cargo))
         self.conexao.commit()
 
-    def adicionar_produto(self, nome, descricao,status, quantia, portador):
+    def adicionar_produto(self, nome, descricao, status, quantia, portador):
         cursor = self.conexao.cursor()
 
         cursor.execute('''
@@ -158,6 +156,7 @@ class BancoDados:
         self.conectar()
         self.criar_tabelas()
         self.desconectar()
+
 
 #
 if __name__ == '__main__':

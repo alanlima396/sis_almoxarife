@@ -3,6 +3,7 @@ from tkinter import ttk
 from defsdb import BancoDados
 from utilitarios import *
 
+
 class Produto:
     def __init__(self, nome, status, quantia, portador, data_registro):
         self.nome = nome
@@ -43,7 +44,7 @@ class Sistema:
         btn_cadastrar_produto = ttk.Button(self.root, text="Cadastrar Produto", command=self.cadastrar_produto)
         btn_cadastrar_produto.pack(pady=20)
 
-        btn_cadastrar_status = ttk.Button(self.root, text='Cadastar Status', command=self.NewStatus)
+        btn_cadastrar_status = ttk.Button(self.root, text='Cadastrar Status', command=self.new_status)
         btn_cadastrar_status.pack()
 
     def cadastrar_funcionario(self):
@@ -104,8 +105,6 @@ class Sistema:
         entry_portador = tk.Entry(win, width=50)
         entry_portador.pack()
 
-
-
         def salvar_produto():
             nome = entry_nome.get()
             status = entry_status.get()
@@ -140,8 +139,7 @@ class Sistema:
         for produto in self.produtos_cadastrados:
             tree.insert("", "end", values=(produto.nome, produto.status, produto.portador))
 
-
-    def NewStatus(self):
+    def new_status(self):
         win = tk.Toplevel()
         win.title("Cadastrar Status")
         win.geometry("400x200")
@@ -157,8 +155,9 @@ class Sistema:
             self.banco.adicionar_status(new)
 
             et_status.delete(0, tk.END)
-        btn_saveStatus = ttk.Button(win, command=salvar_status())
-        btn_saveStatus.pack()
+        btn_save_status = ttk.Button(win, command=salvar_status())
+        btn_save_status.pack()
+
 
 if __name__ == "__main__":
     root = tk.Tk()

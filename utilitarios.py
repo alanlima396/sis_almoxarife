@@ -4,8 +4,6 @@ import win32api
 import win32con
 import customtkinter as ctk
 
-# Agora você pode usar as funções e constantes dos módulos win32api e win32con
-
 
 def data_now():
     data_atual = datetime.datetime.now()
