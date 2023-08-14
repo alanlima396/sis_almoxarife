@@ -23,8 +23,7 @@ class Sistema:
     def __init__(self, raiz):
         self.root = raiz
         self.root.title("Exemplo de Listagem de Produtos")
-        self.root.geometry("600x300")
-
+        self.root.geometry("1080x720")
         self.style = ttk.Style()
         self.style.theme_use("winnative")
 
@@ -47,6 +46,10 @@ class Sistema:
         btn_cadastrar_status = ttk.Button(self.root, text='Cadastrar Status', command=self.new_status)
         btn_cadastrar_status.pack()
 
+    def destroy_win(self, window):
+        self.banco.desconectar()
+        window.destroy()
+
     def cadastrar_funcionario(self):
         win = tk.Toplevel()
         win.title("Cadastrar Funcionário")
@@ -63,27 +66,27 @@ class Sistema:
         entry_cargo.pack()
 
         def salvar_funcionario():
-            nome = entry_nome.get().upper()
-            cargo = entry_cargo.get().lower()
+            nome = entry_nome.get().upper().strip()
+            cargo = entry_cargo.get().lower().strip()
 
-            self.banco.adicionar_funcioanrio(nome, cargo)
-            entry_nome.delete(0, tk.END)
-            entry_cargo.delete(0, tk.END)
+            if nome and cargo == '':
+                notificacao('Os Dados não podem ser vazios!')
 
-        def exit_toplevel():
-            self.banco.desconectar()
-            win.destroy()
+            else:
+                self.banco.adicionar_funcioanrio(nome, cargo)
+                entry_nome.delete(0, tk.END)
+                entry_cargo.delete(0, tk.END)
 
         btn_register = tk.Button(win, text="Salvar", command=lambda: salvar_funcionario(), width=10)
         btn_register.place(x=275, y=110)
 
-        btn_sair = tk.Button(win, text="Sair", command=lambda: exit_toplevel(), width=10)
+        btn_sair = tk.Button(win, text="Sair", command=lambda: self.destroy_win(window=win), width=10)
         btn_sair.place(x=275, y=150)
 
     def cadastrar_produto(self):
         win = tk.Toplevel()
         win.title("Cadastrar Produto")
-        win.geometry("600x400")
+        win.geometry("500x300")
 
         label_nome = tk.Label(win, text="Nome do Produto:")
         label_nome.pack()
@@ -92,8 +95,8 @@ class Sistema:
 
         label_status = tk.Label(win, text="Status")
         label_status.pack()
-        entry_status = tk.Entry(win, width=50)
-        entry_status.pack()
+        combox_status = ttk.Combobox(win, values=self.banco.obter_status())
+        combox_status.pack()
 
         label_quantia = tk.Label(win, text="Quantia")
         label_quantia.pack()
@@ -107,7 +110,7 @@ class Sistema:
 
         def salvar_produto():
             nome = entry_nome.get()
-            status = entry_status.get()
+            status = combox_status.get()
             quantia = int(entry_quantia.get())
             portador = entry_portador.get()
             data_registro = data_now()
@@ -118,12 +121,15 @@ class Sistema:
             self.banco.adicionar_produto(nome, status, quantia, portador, data_registro)
 
             entry_nome.delete(0, tk.END)
-            entry_status.delete(0, tk.END)
+            combox_status.delete(0, tk.END)
             entry_quantia.delete(0, tk.END)
             entry_portador.delete(0, tk.END)
 
         btn_register = tk.Button(win, text="Salvar", command=lambda: salvar_produto(), width=10)
-        btn_register.place(x=275, y=250)
+        btn_register.place(x=210, y=215)
+
+        btn_sair = tk.Button(win, text='Sair', command=lambda: self.destroy_win(win), width=10)
+        btn_sair.place(x=210, y=250)
 
     def show_product_list(self):
         window = tk.Toplevel()
@@ -147,16 +153,23 @@ class Sistema:
         lb_name = tk.Label(win, text='Novo Status:')
         lb_name.pack()
 
-        et_status = tk.Entry(win, width=50)
+        et_status = tk.Entry(win)
         et_status.pack()
 
         def salvar_status():
-            new = et_status.get()
-            self.banco.adicionar_status(new)
+            new = et_status.get().title()
+            if new.strip() == '':
+                notificacao('O Status não pode ser vazio!')
 
-            et_status.delete(0, tk.END)
-        btn_save_status = ttk.Button(win, command=salvar_status())
-        btn_save_status.pack()
+            else:
+                self.banco.adicionar_status(new)
+                et_status.delete(0, tk.END)
+
+        btn_save_status = ttk.Button(win, text='Salvar', command=salvar_status)
+        btn_save_status.place(x=160, y=75)
+
+        btn_sair = ttk.Button(win, text='Sair', command=lambda: self.destroy_win(window=win))
+        btn_sair.place(x=160, y=110)
 
 
 if __name__ == "__main__":

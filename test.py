@@ -1,4 +1,3 @@
-import os
+from utilitarios import *
 
-v = os.path.exists("almocxarifado.db")
-print(v)
+notificacao('Aviso, não faça isso!', som=2)

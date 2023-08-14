@@ -133,12 +133,20 @@ class BancoDados:
     def adicionar_status(self, nome_status):
         cursor = self.conexao.cursor()
 
-        cursor.execute('''
-            INSERT INTO status_itens (nome) VALUES (?)
-        ''', (nome_status,))
+        # Verifica se o status já existe no banco de dados
+        cursor.execute('SELECT nome FROM status_itens WHERE nome = ?', (nome_status,))
+        existing_status = cursor.fetchone()
+
+        if existing_status:
+            notificacao(f"O status '{nome_status}' já está cadastrado.")
+
+        else:
+            cursor.execute('''
+                INSERT INTO status_itens (nome) VALUES (?)
+            ''', (nome_status,))
+            print('Status adicionado com sucesso!')
 
         self.conexao.commit()
-        print('Status adicionado com sucesso!')
 
     def obter_status(self):
         cursor = self.conexao.cursor()

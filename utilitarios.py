@@ -46,3 +46,18 @@ def notificacao(mensagem='Dados Inválidos', som=1):
     root.geometry(f"+{x}+{y}")
 
     root.mainloop()
+
+
+def centralizar_janela(janela):
+    largura_janela = janela.winfo_reqwidth()  # Largura desejada da janela
+    altura_janela = janela.winfo_reqheight()  # Altura desejada da janela
+
+    # Obtém as dimensões da tela do monitor
+    largura_tela = janela.winfo_screenwidth()
+    altura_tela = janela.winfo_screenheight()
+
+    # Calcula as coordenadas de posicionamento para centralizar a janela
+    x = (largura_tela - largura_janela) // 2
+    y = (altura_tela - altura_janela) // 2
+
+    janela.geometry(f"{largura_janela}x{altura_janela}+{x}+{y}")
