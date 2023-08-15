@@ -2,15 +2,18 @@ import tkinter as tk
 from tkinter import ttk
 from defsdb import BancoDados
 from utilitarios import *
+import customtkinter as ctk
+from ttkthemes import ThemedStyle
+
 
 
 class Produto:
-    def __init__(self, nome, status, quantia, portador, data_registro):
+    def __init__(self, nome, descricao, estoque, portador):
         self.nome = nome
-        self.status = status
-        self.quantia = quantia
+        self.descricao = descricao
+        self.estoque = estoque
         self.portador = portador
-        self.data_registro = data_registro
+
 
 
 class Funcionario:
@@ -24,36 +27,38 @@ class Sistema:
         self.root = raiz
         self.root.title("Exemplo de Listagem de Produtos")
         self.root.geometry("1080x720")
-        self.style = ttk.Style()
-        self.style.theme_use("winnative")
-
+        self.style = ThemedStyle(self.root)
+        self.style.theme_use("clam")
+        self.root.protocol("WM_DELETE_WINDOW",self.fechar_janela)
         self.banco = BancoDados()
         self.banco.conectar()
 
-        self.produtos_cadastrados = [
-            Produto("Parafusadeira", "Disponível", 5, "Almoxarifado", "2023-08-10"),
-            Produto("Lixadeira", "Indisponível", 3, "Henrique", "2023-08-09"),
-            # Adicione outros produtos aqui
-        ]
+        self.produtos_cadastrados = self.banco.carregar_produtos(Produto)
 
-        btn_cadastrar_funcionario = ttk.Button(self.root, text="Cadastrar Funcionário",
-                                               command=self.cadastrar_funcionario)
+        btn_cadastrar_funcionario = ctk.CTkButton(self.root, text="Cadastrar Funcionário",
+                                                  command=self.cadastrar_funcionario)
         btn_cadastrar_funcionario.pack(padx=30, pady=20)
 
-        btn_cadastrar_produto = ttk.Button(self.root, text="Cadastrar Produto", command=self.cadastrar_produto)
+        btn_cadastrar_produto = ctk.CTkButton(self.root, text="Cadastrar Produto", command=self.cadastrar_produto,
+                                              height=60)
         btn_cadastrar_produto.pack(pady=20)
 
-        btn_cadastrar_status = ttk.Button(self.root, text='Cadastrar Status', command=self.new_status)
+        btn_cadastrar_status = ctk.CTkButton(self.root, text='Cadastrar Status', command=self.new_status)
         btn_cadastrar_status.pack()
 
+
+
+    def fechar_janela(self):
+        self.banco.desconectar()  # Desconectar o banco antes de fechar
+        self.root.destroy()  # Fechar a janela
+
     def destroy_win(self, window):
-        self.banco.desconectar()
         window.destroy()
 
     def cadastrar_funcionario(self):
         win = tk.Toplevel()
         win.title("Cadastrar Funcionário")
-        win.geometry("600x400")
+        win.geometry("400x200")
 
         label_nome = tk.Label(win, text="Funcionário:")
         label_nome.pack()
@@ -69,7 +74,7 @@ class Sistema:
             nome = entry_nome.get().upper().strip()
             cargo = entry_cargo.get().lower().strip()
 
-            if nome and cargo == '':
+            if nome == '' or cargo == '':
                 notificacao('Os Dados não podem ser vazios!')
 
             else:
@@ -78,10 +83,10 @@ class Sistema:
                 entry_cargo.delete(0, tk.END)
 
         btn_register = tk.Button(win, text="Salvar", command=lambda: salvar_funcionario(), width=10)
-        btn_register.place(x=275, y=110)
+        btn_register.place(x=100, y=100)
 
         btn_sair = tk.Button(win, text="Sair", command=lambda: self.destroy_win(window=win), width=10)
-        btn_sair.place(x=275, y=150)
+        btn_sair.place(x=230, y=100)
 
     def cadastrar_produto(self):
         win = tk.Toplevel()
@@ -95,35 +100,35 @@ class Sistema:
 
         label_status = tk.Label(win, text="Status")
         label_status.pack()
-        combox_status = ttk.Combobox(win, values=self.banco.obter_status())
+        combox_status = ttk.Combobox(win, values=self.banco.obter_dados('status_itens'))
         combox_status.pack()
 
         label_quantia = tk.Label(win, text="Quantia")
         label_quantia.pack()
-        entry_quantia = tk.Entry(win, width=50)
+        entry_quantia = tk.Spinbox(win, from_=0, to=10000)
         entry_quantia.pack()
 
         label_portador = tk.Label(win, text="Portador")
         label_portador.pack()
-        entry_portador = tk.Entry(win, width=50)
-        entry_portador.pack()
+        combox_portador = ttk.Combobox(win, values=self.banco.obter_dados(table='funcionarios'))
+        combox_portador.pack()
 
         def salvar_produto():
-            nome = entry_nome.get()
-            status = combox_status.get()
-            quantia = int(entry_quantia.get())
-            portador = entry_portador.get()
-            data_registro = data_now()
+            nome = entry_nome.get().strip()
+            status = combox_status.get().strip()
+            quantia = entry_quantia.get()
+            portador = combox_portador.get().strip()
 
-            novo_produto = Produto(nome, status, quantia, portador, data_registro)
-            self.produtos_cadastrados.append(novo_produto)
+            if nome == '' or status == '' or portador == '':
+                notificacao("Os campos não podem ser vazios!")
 
-            self.banco.adicionar_produto(nome, status, quantia, portador, data_registro)
+            else:
+                self.banco.adicionar_produto(nome, status, quantia, portador)
 
-            entry_nome.delete(0, tk.END)
-            combox_status.delete(0, tk.END)
-            entry_quantia.delete(0, tk.END)
-            entry_portador.delete(0, tk.END)
+                entry_nome.delete(0, tk.END)
+                combox_status.delete(0, tk.END)
+                entry_quantia.delete(0, tk.END)
+                combox_portador.delete(0, tk.END)
 
         btn_register = tk.Button(win, text="Salvar", command=lambda: salvar_produto(), width=10)
         btn_register.place(x=210, y=215)
@@ -143,7 +148,7 @@ class Sistema:
         tree.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
         for produto in self.produtos_cadastrados:
-            tree.insert("", "end", values=(produto.nome, produto.status, produto.portador))
+            tree.insert("", "end", values=(produto.nome, produto.descricao, produto.portador))
 
     def new_status(self):
         win = tk.Toplevel()

@@ -44,9 +44,9 @@ class BancoDados:
                 CREATE TABLE IF NOT EXISTS itens (
                     id INTEGER PRIMARY KEY,
                     nome TEXT,
-                    descricao TEXT,
                     estoque INTEGER,
-                    portador text
+                    portador text,
+                    status TEXT
                 )
             ''')
 
@@ -120,12 +120,12 @@ class BancoDados:
         ''', (nome, cargo))
         self.conexao.commit()
 
-    def adicionar_produto(self, nome, descricao, status, quantia, portador):
+    def adicionar_produto(self, nome, status, quantia, portador):
         cursor = self.conexao.cursor()
 
         cursor.execute('''
-            INSERT INTO itens (nome, descricao, status, estoque, portador) VALUES (?, ?, ?)
-        ''', (nome, descricao, status, quantia, portador))
+            INSERT INTO itens (nome,  status, estoque, portador) VALUES (?, ?, ?, ?)
+        ''', (nome, status, quantia, portador))
 
         self.conexao.commit()
         print('Produto Registrado com Sucesso!')
@@ -148,15 +148,29 @@ class BancoDados:
 
         self.conexao.commit()
 
-    def obter_status(self):
+    def obter_dados(self, table, colun='nome'):
         cursor = self.conexao.cursor()
 
-        cursor.execute('''
-            SELECT nome FROM status_itens
+        cursor.execute(f'''
+            SELECT {colun} FROM {table}
         ''')
 
         status = [row[0] for row in cursor.fetchall()]
         return status
+
+    def carregar_produtos(self, classe):
+        self.conectar()
+        cursor = self.conexao.cursor()
+        cursor.execute("SELECT nome, status, estoque, portador FROM itens")
+        dados = cursor.fetchall()
+
+        produtos = []
+
+        for dado in dados:
+            produtos.append(classe(*dado))
+
+        cursor.close()
+        return produtos
 
     def setup(self):
         if not os.path.exists("almoxarifado.db"):
