@@ -2,9 +2,8 @@ import tkinter as tk
 from tkinter import ttk
 from defsdb import BancoDados
 from utilitarios import *
-import customtkinter as ctk
+from PIL import Image, ImageTk
 from ttkthemes import ThemedStyle
-
 
 
 class Produto:
@@ -15,45 +14,52 @@ class Produto:
         self.portador = portador
 
 
-
 class Funcionario:
     def __init__(self, nome, email):
         self.nome = nome
         self.email = email
 
 
+def destroy_win(window):
+    window.destroy()
+
+
 class Sistema:
     def __init__(self, raiz):
         self.root = raiz
         self.root.title("Exemplo de Listagem de Produtos")
+
+        # carregar imagens:
+        imagem = Image.open('background2.png')
+        photo = ImageTk.PhotoImage(imagem)
+
         self.root.geometry("1080x720")
         self.style = ThemedStyle(self.root)
-        self.style.theme_use("clam")
-        self.root.protocol("WM_DELETE_WINDOW",self.fechar_janela)
+        self.style.theme_use("black")
+        self.root.protocol("WM_DELETE_WINDOW", self.fechar_janela)
         self.banco = BancoDados()
         self.banco.conectar()
 
         self.produtos_cadastrados = self.banco.carregar_produtos(Produto)
 
-        btn_cadastrar_funcionario = ctk.CTkButton(self.root, text="Cadastrar Funcionário",
-                                                  command=self.cadastrar_funcionario)
+        label_img = tk.Label(self.root, image=photo)
+        label_img.place(x=0, y=100)
+
+        btn_cadastrar_funcionario = tk.Button(self.root, text="Cadastrar Funcionário", height=3, width=18,
+                                              command=self.cadastrar_funcionario)
         btn_cadastrar_funcionario.pack(padx=30, pady=20)
 
-        btn_cadastrar_produto = ctk.CTkButton(self.root, text="Cadastrar Produto", command=self.cadastrar_produto,
-                                              height=60)
+        btn_cadastrar_produto = tk.Button(self.root, text="Cadastrar Produto", command=self.cadastrar_produto,
+                                          height=3, width=18)
         btn_cadastrar_produto.pack(pady=20)
 
-        btn_cadastrar_status = ctk.CTkButton(self.root, text='Cadastrar Status', command=self.new_status)
+        btn_cadastrar_status = tk.Button(self.root, text='Cadastrar Status', height=3, width=18, command=self.new_status
+                                         )
         btn_cadastrar_status.pack()
-
-
 
     def fechar_janela(self):
         self.banco.desconectar()  # Desconectar o banco antes de fechar
         self.root.destroy()  # Fechar a janela
-
-    def destroy_win(self, window):
-        window.destroy()
 
     def cadastrar_funcionario(self):
         win = tk.Toplevel()
@@ -85,7 +91,7 @@ class Sistema:
         btn_register = tk.Button(win, text="Salvar", command=lambda: salvar_funcionario(), width=10)
         btn_register.place(x=100, y=100)
 
-        btn_sair = tk.Button(win, text="Sair", command=lambda: self.destroy_win(window=win), width=10)
+        btn_sair = tk.Button(win, text="Sair", command=lambda: destroy_win(window=win), width=10)
         btn_sair.place(x=230, y=100)
 
     def cadastrar_produto(self):
@@ -133,7 +139,7 @@ class Sistema:
         btn_register = tk.Button(win, text="Salvar", command=lambda: salvar_produto(), width=10)
         btn_register.place(x=210, y=215)
 
-        btn_sair = tk.Button(win, text='Sair', command=lambda: self.destroy_win(win), width=10)
+        btn_sair = tk.Button(win, text='Sair', command=lambda: destroy_win(win), width=10)
         btn_sair.place(x=210, y=250)
 
     def show_product_list(self):
@@ -173,7 +179,7 @@ class Sistema:
         btn_save_status = ttk.Button(win, text='Salvar', command=salvar_status)
         btn_save_status.place(x=160, y=75)
 
-        btn_sair = ttk.Button(win, text='Sair', command=lambda: self.destroy_win(window=win))
+        btn_sair = ttk.Button(win, text='Sair', command=lambda: destroy_win(window=win))
         btn_sair.place(x=160, y=110)
 
 
