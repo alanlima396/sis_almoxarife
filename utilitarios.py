@@ -2,7 +2,7 @@ import datetime
 import winsound
 import win32api
 import win32con
-import customtkinter as ctk
+import tkinter as tk
 
 
 def data_now():
@@ -18,16 +18,15 @@ def notificacao(mensagem='Dados Inválidos', som=1):
     else:
         winsound.PlaySound("SystemExclamation", winsound.SND_ASYNC)
     # Janela da Notificação.
-    root = ctk.CTk()
+    root = tk.Tk()
     root.iconbitmap('notify.ico')
     root.title("Notificação")
     root.resizable(False, False)
 
-    label = ctk.CTkLabel(root, text=mensagem, font=("Arial", 20), width=30, height=5)
+    label = tk.Label(root, text=mensagem, font=("Arial", 12))
     label.pack(padx=10, pady=10)
 
-    button = ctk.CTkButton(root, text="Fechar", width=40, height=35, corner_radius=10, command=root.destroy,
-                           fg_color='#F5FF00', text_color='#000000', hover_color='#FFAA00')
+    button = tk.Button(root, text="Fechar", width=10, command=root.destroy)
     button.pack(padx=5, pady=5)
 
     # Obter a largura e altura da janela
@@ -56,7 +55,7 @@ def centralizar_janela(janela):
     largura_tela = janela.winfo_screenwidth()
     altura_tela = janela.winfo_screenheight()
 
-    # Calcula as coordenadas de posicionamento para centralizar a janela
+    # Calculi as coordenadas de posicionamento para centralizar a janela
     x = (largura_tela - largura_janela) // 2
     y = (altura_tela - altura_janela) // 2
 

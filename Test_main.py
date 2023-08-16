@@ -24,47 +24,85 @@ def destroy_win(window):
     window.destroy()
 
 
+def mostrar_funcionarios(local, funcionarios):
+    # Aqui você pode criar uma nova janela ou um frame para mostrar a lista de funcionários
+    # Por exemplo, você pode usar uma Treeview para exibir os funcionários em uma tabela
+    # Certifique-se de configurar as colunas adequadamente
+    frame_tree = tk.Frame(local, width=700, height=300)
+    frame_tree.place(x=100, y=0)
+
+    tree = ttk.Treeview(frame_tree, columns=("ID", "Nome", "Cargo"), show="headings")
+
+    tree.heading("ID", text="ID")
+    tree.heading("Nome", text="Nome")
+    tree.heading("Cargo", text="Cargo")
+
+    tree.pack()
+
+    for funcionario in funcionarios:
+        tree.insert("", "end", values=(funcionario["id"], funcionario["nome"], funcionario["cargo"]))
+
+    btn_exit = tk.Button(frame_tree, text='Quit', command=frame_tree.destroy, width=10)
+    btn_exit.place(x=520, y=200)
+
+
 class Sistema:
     def __init__(self, raiz):
         self.root = raiz
         self.root.title("Exemplo de Listagem de Produtos")
-
-        # carregar imagens:
-        imagem = Image.open('background2.png')
-        photo = ImageTk.PhotoImage(imagem)
-
         self.root.geometry("1080x720")
+        self.root.resizable(False, False)
         self.style = ThemedStyle(self.root)
-        self.style.theme_use("black")
+        self.style.theme_use("clam")
         self.root.protocol("WM_DELETE_WINDOW", self.fechar_janela)
+        self.root.configure(bg="#FFAAFF")
         self.banco = BancoDados()
         self.banco.conectar()
-
         self.produtos_cadastrados = self.banco.carregar_produtos(Produto)
 
-        label_img = tk.Label(self.root, image=photo)
-        label_img.place(x=0, y=100)
+        # carregar imagens:
+        self.imagem = Image.open('background1.png')
+        self.photo = ImageTk.PhotoImage(self.imagem)
+        self.label_img = tk.Label(self.root, image=self.photo)
+        self.label_img.place(x=50, y=30)
 
-        btn_cadastrar_funcionario = tk.Button(self.root, text="Cadastrar Funcionário", height=3, width=18,
-                                              command=self.cadastrar_funcionario)
-        btn_cadastrar_funcionario.pack(padx=30, pady=20)
+        btn_funcionario = tk.Button(self.root, text="Funcionários", height=3, width=18,
+                                    command=self.funcionarios)
+        btn_funcionario.place(x=25, y=50)
 
         btn_cadastrar_produto = tk.Button(self.root, text="Cadastrar Produto", command=self.cadastrar_produto,
                                           height=3, width=18)
-        btn_cadastrar_produto.pack(pady=20)
+        btn_cadastrar_produto.place(x=25, y=150)
 
         btn_cadastrar_status = tk.Button(self.root, text='Cadastrar Status', height=3, width=18, command=self.new_status
                                          )
-        btn_cadastrar_status.pack()
+        btn_cadastrar_status.place(x=25, y=250)
 
+    # Defs Para Lidar com janela.
     def fechar_janela(self):
         self.banco.desconectar()  # Desconectar o banco antes de fechar
         self.root.destroy()  # Fechar a janela
 
+    # Defs para lidar com funcionários
+    def funcionarios(self):
+        frame = tk.Frame(self.root, width=800, height=300)
+        frame.place(x=200, y=30)
+
+        btn_view = tk.Button(frame, text='Visualizar', command=lambda: self.visualizar_funcionarios(frame))
+        btn_view.place(x=10, y=20)
+
+        btn_cadastrar = tk.Button(frame, text='Cadastrar', command=self.cadastrar_funcionario)
+        btn_cadastrar.place(x=10, y=60)
+
+        btn_voltar = tk.Button(frame, text='Voltar', command=lambda: frame.destroy())
+        btn_voltar.place(x=10, y=210)
+
     def cadastrar_funcionario(self):
         win = tk.Toplevel()
         win.title("Cadastrar Funcionário")
-        win.geometry("400x200")
+
+        win.resizable(False, False)
+        win.geometry('400x200')
 
         label_nome = tk.Label(win, text="Funcionário:")
         label_nome.pack()
@@ -94,10 +132,16 @@ class Sistema:
         btn_sair = tk.Button(win, text="Sair", command=lambda: destroy_win(window=win), width=10)
         btn_sair.place(x=230, y=100)
 
+    def visualizar_funcionarios(self, master):
+        funcionarios = self.banco.obter_funcionarios()
+        mostrar_funcionarios(master, funcionarios)
+
+    # Defs para Lidar com produtos:
     def cadastrar_produto(self):
         win = tk.Toplevel()
         win.title("Cadastrar Produto")
         win.geometry("500x300")
+        win.resizable(False, False)
 
         label_nome = tk.Label(win, text="Nome do Produto:")
         label_nome.pack()
@@ -160,6 +204,7 @@ class Sistema:
         win = tk.Toplevel()
         win.title("Cadastrar Status")
         win.geometry("400x200")
+        win.resizable(False, False)
 
         lb_name = tk.Label(win, text='Novo Status:')
         lb_name.pack()

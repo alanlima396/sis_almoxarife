@@ -158,6 +158,24 @@ class BancoDados:
         status = [row[0] for row in cursor.fetchall()]
         return status
 
+    def obter_funcionarios(self):
+        cursor = self.conexao.cursor()
+
+        cursor.execute('''
+              SELECT id, nome, cargo FROM funcionarios
+          ''')
+
+        funcionarios = []
+        for row in cursor.fetchall():
+            funcionario = {
+                "id": row[0],
+                "nome": row[1],
+                "cargo": row[2]
+            }
+            funcionarios.append(funcionario)
+
+        return funcionarios
+
     def carregar_produtos(self, classe):
         self.conectar()
         cursor = self.conexao.cursor()
