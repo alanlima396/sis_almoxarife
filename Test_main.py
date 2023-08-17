@@ -1,9 +1,9 @@
-import tkinter as tk
 from tkinter import ttk
 from defsdb import BancoDados
 from utilitarios import *
 from PIL import Image, ImageTk
 from ttkthemes import ThemedStyle
+from tkinter import messagebox
 
 
 class Produto:
@@ -50,12 +50,12 @@ class Sistema:
     def __init__(self, raiz):
         self.root = raiz
         self.root.title("Exemplo de Listagem de Produtos")
-        self.root.geometry("1080x720")
+        self.root.geometry("1100x600")
         self.root.resizable(False, False)
         self.style = ThemedStyle(self.root)
         self.style.theme_use("clam")
         self.root.protocol("WM_DELETE_WINDOW", self.fechar_janela)
-        self.root.configure(bg="#FFAAFF")
+        self.root.configure(bg="#00AAFF")
         self.banco = BancoDados()
         self.banco.conectar()
         self.produtos_cadastrados = self.banco.carregar_produtos(Produto)
@@ -64,7 +64,7 @@ class Sistema:
         self.imagem = Image.open('background1.png')
         self.photo = ImageTk.PhotoImage(self.imagem)
         self.label_img = tk.Label(self.root, image=self.photo)
-        self.label_img.place(x=50, y=30)
+        self.label_img.place(x=50, y=36)
 
         btn_funcionario = tk.Button(self.root, text="Funcionários", height=3, width=18,
                                     command=self.funcionarios)
@@ -88,14 +88,41 @@ class Sistema:
         frame = tk.Frame(self.root, width=800, height=300)
         frame.place(x=200, y=30)
 
-        btn_view = tk.Button(frame, text='Visualizar', command=lambda: self.visualizar_funcionarios(frame))
+        btn_view = ttk.Button(frame, text='Visualizar', command=lambda: self.visualizar_funcionarios(frame))
         btn_view.place(x=10, y=20)
 
-        btn_cadastrar = tk.Button(frame, text='Cadastrar', command=self.cadastrar_funcionario)
+        btn_cadastrar = ttk.Button(frame, text='Cadastrar', command=self.cadastrar_funcionario)
         btn_cadastrar.place(x=10, y=60)
+
+        btn_excluir_funcionario = ttk.Button(frame, text='Excluir', command=lambda: self.excluir_funcionario(frame))
+        btn_excluir_funcionario.place(x=10, y=100)
 
         btn_voltar = tk.Button(frame, text='Voltar', command=lambda: frame.destroy())
         btn_voltar.place(x=10, y=210)
+
+    def excluir_funcionario(self, master):
+        def confirmar_exclusao():
+            nome = combobox.get()
+            if nome:
+                resposta = messagebox.askyesno("Confirmar Exclusão",
+                                               f"Tem certeza que deseja excluir o funcionário {nome}?")
+                if resposta:
+                    self.banco.excluir_funcionario_por_nome(nome)
+                    frame_excluir.destroy()
+            else:
+                notificacao('Os campos não podem ser vazios!')
+
+        frame_excluir = tk.Frame(master, width=200, height=150)
+        frame_excluir.place(x=250, y=50)
+
+        combobox = ttk.Combobox(frame_excluir, width=26, values=self.banco.obter_nomes_funcionarios())
+        combobox.place(x=10, y=10)
+
+        btn_excluir = ttk.Button(frame_excluir, text='Deletar Funcionário', command=lambda: confirmar_exclusao())
+        btn_excluir.place(x=30, y=40)
+
+        btn_cancelar = ttk.Button(frame_excluir, text='Cancelar', command=frame_excluir.destroy, width=17)
+        btn_cancelar.place(x=30, y=90)
 
     def cadastrar_funcionario(self):
         win = tk.Toplevel()
@@ -171,19 +198,25 @@ class Sistema:
 
             if nome == '' or status == '' or portador == '':
                 notificacao("Os campos não podem ser vazios!")
-
             else:
-                self.banco.adicionar_produto(nome, status, quantia, portador)
+                try:
+                    if status not in combox_status['values']:
+                        notificacao(f"Status '{status}' inválido!")
+                    elif portador not in combox_portador['values']:
+                        notificacao(f"Portador '{portador}' inválido!")
+                    else:
+                        self.banco.adicionar_produto(nome, status, quantia, portador)
+                        entry_nome.delete(0, tk.END)
+                        combox_status.delete(0, tk.END)
+                        entry_quantia.delete(0, tk.END)
+                        combox_portador.delete(0, tk.END)
+                except Exception as e:
+                    notificacao(f"Erro: {str(e)}")
 
-                entry_nome.delete(0, tk.END)
-                combox_status.delete(0, tk.END)
-                entry_quantia.delete(0, tk.END)
-                combox_portador.delete(0, tk.END)
-
-        btn_register = tk.Button(win, text="Salvar", command=lambda: salvar_produto(), width=10)
+        btn_register = tk.Button(win, text="Salvar", command=salvar_produto, width=10)
         btn_register.place(x=210, y=215)
 
-        btn_sair = tk.Button(win, text='Sair', command=lambda: destroy_win(win), width=10)
+        btn_sair = tk.Button(win, text='Sair', command=win.destroy, width=10)
         btn_sair.place(x=210, y=250)
 
     def show_product_list(self):

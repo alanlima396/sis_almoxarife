@@ -120,6 +120,27 @@ class BancoDados:
         ''', (nome, cargo))
         self.conexao.commit()
 
+    def obter_nomes_funcionarios(self):
+        cursor = self.conexao.cursor()
+        cursor.execute('SELECT nome FROM funcionarios')
+        nomes = [row[0] for row in cursor.fetchall()]
+        return nomes
+
+    def excluir_funcionario_por_nome(self, nome):
+        cursor = self.conexao.cursor()
+
+        try:
+            cursor.execute('DELETE FROM funcionarios WHERE nome = ?', (nome,))
+            if cursor.rowcount > 0:
+                self.conexao.commit()
+                notificacao('Funcionário excluído com sucesso!')
+            else:
+                notificacao(f'Funcionário "{nome}" não encontrado.')
+        except sqlite3.Error as e:
+            print('Erro ao excluir funcionário:', e)
+        finally:
+            cursor.close()  # Lembre-se de fechar o cursor
+
     def adicionar_produto(self, nome, status, quantia, portador):
         cursor = self.conexao.cursor()
 
@@ -128,7 +149,7 @@ class BancoDados:
         ''', (nome, status, quantia, portador))
 
         self.conexao.commit()
-        print('Produto Registrado com Sucesso!')
+        notificacao('Produto Registrado com Sucesso!')
 
     def adicionar_status(self, nome_status):
         cursor = self.conexao.cursor()
