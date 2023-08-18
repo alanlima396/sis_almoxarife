@@ -29,7 +29,7 @@ def mostrar_funcionarios(local, funcionarios):
     # Por exemplo, você pode usar uma Treeview para exibir os funcionários em uma tabela
     # Certifique-se de configurar as colunas adequadamente
     frame_tree = tk.Frame(local, width=700, height=300)
-    frame_tree.place(x=100, y=0)
+    frame_tree.place(x=140, y=0)
 
     tree = ttk.Treeview(frame_tree, columns=("ID", "Nome", "Cargo"), show="headings")
 
@@ -70,7 +70,7 @@ class Sistema:
                                     command=self.funcionarios)
         btn_funcionario.place(x=25, y=50)
 
-        btn_cadastrar_produto = tk.Button(self.root, text="Cadastrar Produto", command=self.cadastrar_produto,
+        btn_cadastrar_produto = tk.Button(self.root, text="Produto", command=self.produtos,
                                           height=3, width=18)
         btn_cadastrar_produto.place(x=25, y=150)
 
@@ -88,6 +88,9 @@ class Sistema:
         frame = tk.Frame(self.root, width=800, height=300)
         frame.place(x=200, y=30)
 
+        background01 = tk.Label(frame, width=120, height=50, bg='#5555FF')
+        background01.place(x=0, y=0)
+
         btn_view = ttk.Button(frame, text='Visualizar', command=lambda: self.visualizar_funcionarios(frame))
         btn_view.place(x=10, y=20)
 
@@ -97,7 +100,7 @@ class Sistema:
         btn_excluir_funcionario = ttk.Button(frame, text='Excluir', command=lambda: self.excluir_funcionario(frame))
         btn_excluir_funcionario.place(x=10, y=100)
 
-        btn_voltar = tk.Button(frame, text='Voltar', command=lambda: frame.destroy())
+        btn_voltar = tk.Button(frame, text='Voltar', width=12, command=lambda: frame.destroy())
         btn_voltar.place(x=10, y=210)
 
     def excluir_funcionario(self, master):
@@ -164,6 +167,32 @@ class Sistema:
         mostrar_funcionarios(master, funcionarios)
 
     # Defs para Lidar com produtos:
+
+    def produtos(self):
+        frame = tk.Frame(self.root, width=800, height=300)
+        frame.place(x=200, y=30)
+
+        bg = tk.Label(frame, width=120, height=20, bg='#CCCCCC')
+        bg.place(x=0, y=0)
+
+        background01 = tk.Label(frame, width=16, height=12, bg='#888888')
+        background01.place(x=0, y=5)
+
+        btn_listar = ttk.Button(frame, text='Listar Itens', command=lambda: self.show_product_list(frame))
+        btn_listar.place(x=10, y=20)
+
+        btn_alocar = ttk.Button(frame, text='Alocar')
+        btn_alocar.place(x=10, y=60)
+
+        btn_cadastrar = ttk.Button(frame, text='Cadastrar', command=self.cadastrar_produto)
+        btn_cadastrar.place(x=10, y=100)
+
+        btn_excluir = ttk.Button(frame, text='Excluir Itens')
+        btn_excluir.place(x=10, y=140)
+
+        btn_closer = tk.Button(frame, text='Close', width=15, command=frame.destroy)
+        btn_closer.place(x=12, y=250)
+
     def cadastrar_produto(self):
         win = tk.Toplevel()
         win.title("Cadastrar Produto")
@@ -219,12 +248,13 @@ class Sistema:
         btn_sair = tk.Button(win, text='Sair', command=win.destroy, width=10)
         btn_sair.place(x=210, y=250)
 
-    def show_product_list(self):
-        window = tk.Toplevel()
-        window.title("Lista de Produtos")
-        window.geometry("600x400")
+    def show_product_list(self, master):
+        frame_show = tk.Frame(master, width=800, height=300)
+        frame_show.place(x=150, y=0)
 
-        tree = ttk.Treeview(window, columns=("Nome do Produto", "Status", "Portador"), show="headings")
+        self.produtos_cadastrados = self.banco.carregar_produtos(Produto)
+
+        tree = ttk.Treeview(frame_show, columns=("Nome do Produto", "Status", "Portador"), show="headings")
         tree.heading("#1", text="Nome do Produto")
         tree.heading("#2", text="Status")
         tree.heading("#3", text="Portador")
@@ -232,6 +262,9 @@ class Sistema:
 
         for produto in self.produtos_cadastrados:
             tree.insert("", "end", values=(produto.nome, produto.descricao, produto.portador))
+
+        btn_quit = tk.Button(frame_show, text='Quit', command=frame_show.destroy)
+        btn_quit.place(x=570, y=200)
 
     def new_status(self):
         win = tk.Toplevel()

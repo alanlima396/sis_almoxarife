@@ -212,10 +212,10 @@ class BancoDados:
         return produtos
 
     def setup(self):
-        if not os.path.exists("almoxarifado.db"):
+        if not os.path.exists(self.nome_banco):
             notificacao('Banco de dados não encontrado, o Sistema criará um.')
+            self.criar_tabelas()
         self.conectar()
-        self.criar_tabelas()
         self.desconectar()
 
 
