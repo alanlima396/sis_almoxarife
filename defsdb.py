@@ -42,8 +42,8 @@ class BancoDados:
             # Cria a tabela itens
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS itens (
-                    id INTEGER PRIMARY KEY,
-                    nome TEXT,
+                    id INTEGER UNIQUE,
+                    nome TEXT PRIMARY KEY,
                     estoque INTEGER,
                     portador text,
                     status TEXT
@@ -178,6 +178,13 @@ class BancoDados:
 
         status = [row[0] for row in cursor.fetchall()]
         return status
+
+    def obter_nomes_itens(self):
+        cursor = self.conexao.cursor()
+        cursor.execute("SELECT nome FROM itens")
+        nomes = [row[0] for row in cursor.fetchall()]
+        cursor.close()
+        return nomes
 
     def obter_funcionarios(self):
         cursor = self.conexao.cursor()

@@ -36,7 +36,6 @@ def mostrar_funcionarios(local, funcionarios):
     tree.heading("ID", text="ID")
     tree.heading("Nome", text="Nome")
     tree.heading("Cargo", text="Cargo")
-
     tree.pack()
 
     for funcionario in funcionarios:
@@ -46,10 +45,49 @@ def mostrar_funcionarios(local, funcionarios):
     btn_exit.place(x=520, y=200)
 
 
+def alocar(master, banco):
+    frame = tk.Frame(master, width=800, height=300)
+    frame.place(x=200, y=30)
+
+    nomes_itens = banco.obter_nomes_itens()
+
+    entry_busca = ttk.Entry(frame, width=15)
+    entry_busca.place(x=25, y=30)
+
+    lista_resultados = tk.Listbox(frame)
+    lista_resultados.place(x=25, y=50)
+
+    def atualizar_lista(event):
+        termo_busca = entry_busca.get().strip().lower()
+        lista_resultados.delete(0, tk.END)
+
+        if termo_busca:
+            resultados = [item for item in nomes_itens if termo_busca in item.lower()]
+            for resultado in resultados:
+                lista_resultados.insert(tk.END, resultado)
+
+        else:
+            # Se o campo de busca estiver vazio, mostrar todos os itens
+            for item in nomes_itens:
+                lista_resultados.insert(tk.END, item)
+
+    def vincular_nome(event):
+        selected_item = lista_resultados.get(tk.ACTIVE)  # Obtém o item selecionado
+        entry_busca.delete(0, tk.END)  # Limpa  Entry
+        entry_busca.insert(0, selected_item)  # Insere o nome selecionado na Entry
+
+    entry_busca.bind("<KeyRelease>", atualizar_lista)
+    lista_resultados.bind("<Button-1>", vincular_nome)  # Vincula o evento de duplo clique
+
+    btn_sair = tk.Button(frame, text='Sair', command=frame.destroy)
+    btn_sair.place(x=15, y=220)
+
+
 class Sistema:
     def __init__(self, raiz):
         self.root = raiz
-        self.root.title("Exemplo de Listagem de Produtos")
+        self.root.title("NZservices")
+        self.root.iconbitmap('ico_logo.ico')
         self.root.geometry("1100x600")
         self.root.resizable(False, False)
         self.style = ThemedStyle(self.root)
@@ -57,14 +95,15 @@ class Sistema:
         self.root.protocol("WM_DELETE_WINDOW", self.fechar_janela)
         self.root.configure(bg="#00AAFF")
         self.banco = BancoDados()
+        self.banco.setup()
         self.banco.conectar()
         self.produtos_cadastrados = self.banco.carregar_produtos(Produto)
 
+        # Defer a criação da PhotoImage
+        self.photo = None
+
         # carregar imagens:
-        self.imagem = Image.open('background1.png')
-        self.photo = ImageTk.PhotoImage(self.imagem)
-        self.label_img = tk.Label(self.root, image=self.photo)
-        self.label_img.place(x=50, y=36)
+        self.load_image()
 
         btn_funcionario = tk.Button(self.root, text="Funcionários", height=3, width=18,
                                     command=self.funcionarios)
@@ -79,6 +118,12 @@ class Sistema:
         btn_cadastrar_status.place(x=25, y=250)
 
     # Defs Para Lidar com janela.
+    def load_image(self):
+        imagem = Image.open('background1.png')
+        self.photo = ImageTk.PhotoImage(imagem)
+        label_img = tk.Label(self.root, image=self.photo)
+        label_img.place(x=50, y=36)
+
     def fechar_janela(self):
         self.banco.desconectar()  # Desconectar o banco antes de fechar
         self.root.destroy()  # Fechar a janela
@@ -88,8 +133,11 @@ class Sistema:
         frame = tk.Frame(self.root, width=800, height=300)
         frame.place(x=200, y=30)
 
-        background01 = tk.Label(frame, width=120, height=50, bg='#5555FF')
+        background01 = tk.Label(frame, width=120, height=50, bg='#005AFF')
         background01.place(x=0, y=0)
+
+        background02 = tk.Label(frame, width=16, height=16, bg='#0000FF')
+        background02.place(x=0, y=0)
 
         btn_view = ttk.Button(frame, text='Visualizar', command=lambda: self.visualizar_funcionarios(frame))
         btn_view.place(x=10, y=20)
@@ -172,16 +220,16 @@ class Sistema:
         frame = tk.Frame(self.root, width=800, height=300)
         frame.place(x=200, y=30)
 
-        bg = tk.Label(frame, width=120, height=20, bg='#CCCCCC')
+        bg = tk.Label(frame, width=120, height=20, bg='#00FF50')
         bg.place(x=0, y=0)
 
-        background01 = tk.Label(frame, width=16, height=12, bg='#888888')
+        background01 = tk.Label(frame, width=16, height=18, bg='#32CD32')
         background01.place(x=0, y=5)
 
         btn_listar = ttk.Button(frame, text='Listar Itens', command=lambda: self.show_product_list(frame))
         btn_listar.place(x=10, y=20)
 
-        btn_alocar = ttk.Button(frame, text='Alocar')
+        btn_alocar = ttk.Button(frame, text='Alocar', command=lambda: alocar(frame, self.banco))
         btn_alocar.place(x=10, y=60)
 
         btn_cadastrar = ttk.Button(frame, text='Cadastrar', command=self.cadastrar_produto)
@@ -190,8 +238,8 @@ class Sistema:
         btn_excluir = ttk.Button(frame, text='Excluir Itens')
         btn_excluir.place(x=10, y=140)
 
-        btn_closer = tk.Button(frame, text='Close', width=15, command=frame.destroy)
-        btn_closer.place(x=12, y=250)
+        btn_closer = tk.Button(frame, text='Close', width=13, command=frame.destroy)
+        btn_closer.place(x=8, y=250)
 
     def cadastrar_produto(self):
         win = tk.Toplevel()
@@ -295,6 +343,8 @@ class Sistema:
 
 
 if __name__ == "__main__":
+    db = BancoDados()
+    db.setup()
     root = tk.Tk()
     sistema = Sistema(root)
     root.mainloop()
