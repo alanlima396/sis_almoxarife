@@ -49,10 +49,14 @@ def alocar(master, banco):
     frame = tk.Frame(master, width=800, height=300)
     frame.place(x=200, y=30)
 
-    nomes_itens = banco.obter_nomes_itens()
+    nomes_itens = banco.obter_dados(table='itens')
+    nomes_funcionarios = banco.obter_dados(table='funcionarios')
 
-    entry_busca = ttk.Entry(frame, width=15)
+    entry_busca = ttk.Entry(frame, width=20)
     entry_busca.place(x=25, y=30)
+
+    entry_nomes = ttk.Entry(frame)
+    entry_nomes.place(x=175, y=30)
 
     lista_resultados = tk.Listbox(frame)
     lista_resultados.place(x=25, y=50)
@@ -77,7 +81,7 @@ def alocar(master, banco):
         entry_busca.insert(0, selected_item)  # Insere o nome selecionado na Entry
 
     entry_busca.bind("<KeyRelease>", atualizar_lista)
-    lista_resultados.bind("<Button-1>", vincular_nome)  # Vincula o evento de duplo clique
+    lista_resultados.bind("<Button-1>", vincular_nome)  # Vincula o evento de clique
 
     btn_sair = tk.Button(frame, text='Sair', command=frame.destroy)
     btn_sair.place(x=15, y=220)
