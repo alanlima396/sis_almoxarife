@@ -1,4 +1,3 @@
-from tkinter import ttk
 from defsdb import BancoDados
 from utilitarios import *
 from PIL import Image, ImageTk
@@ -18,73 +17,6 @@ class Funcionario:
     def __init__(self, nome, email):
         self.nome = nome
         self.email = email
-
-
-def destroy_win(window):
-    window.destroy()
-
-
-def mostrar_funcionarios(local, funcionarios):
-    # Aqui você pode criar uma nova janela ou um frame para mostrar a lista de funcionários
-    # Por exemplo, você pode usar uma Treeview para exibir os funcionários em uma tabela
-    # Certifique-se de configurar as colunas adequadamente
-    frame_tree = tk.Frame(local, width=700, height=300)
-    frame_tree.place(x=140, y=0)
-
-    tree = ttk.Treeview(frame_tree, columns=("ID", "Nome", "Cargo"), show="headings")
-
-    tree.heading("ID", text="ID")
-    tree.heading("Nome", text="Nome")
-    tree.heading("Cargo", text="Cargo")
-    tree.pack()
-
-    for funcionario in funcionarios:
-        tree.insert("", "end", values=(funcionario["id"], funcionario["nome"], funcionario["cargo"]))
-
-    btn_exit = tk.Button(frame_tree, text='Quit', command=frame_tree.destroy, width=10)
-    btn_exit.place(x=520, y=200)
-
-
-def alocar(master, banco):
-    frame = tk.Frame(master, width=800, height=300)
-    frame.place(x=200, y=30)
-
-    nomes_itens = banco.obter_dados(table='itens')
-    nomes_funcionarios = banco.obter_dados(table='funcionarios')
-
-    entry_busca = ttk.Entry(frame, width=20)
-    entry_busca.place(x=25, y=30)
-
-    entry_nomes = ttk.Entry(frame)
-    entry_nomes.place(x=175, y=30)
-
-    lista_resultados = tk.Listbox(frame)
-    lista_resultados.place(x=25, y=50)
-
-    def atualizar_lista(event):
-        termo_busca = entry_busca.get().strip().lower()
-        lista_resultados.delete(0, tk.END)
-
-        if termo_busca:
-            resultados = [item for item in nomes_itens if termo_busca in item.lower()]
-            for resultado in resultados:
-                lista_resultados.insert(tk.END, resultado)
-
-        else:
-            # Se o campo de busca estiver vazio, mostrar todos os itens
-            for item in nomes_itens:
-                lista_resultados.insert(tk.END, item)
-
-    def vincular_nome(event):
-        selected_item = lista_resultados.get(tk.ACTIVE)  # Obtém o item selecionado
-        entry_busca.delete(0, tk.END)  # Limpa  Entry
-        entry_busca.insert(0, selected_item)  # Insere o nome selecionado na Entry
-
-    entry_busca.bind("<KeyRelease>", atualizar_lista)
-    lista_resultados.bind("<Button-1>", vincular_nome)  # Vincula o evento de clique
-
-    btn_sair = tk.Button(frame, text='Sair', command=frame.destroy)
-    btn_sair.place(x=15, y=220)
 
 
 class Sistema:
@@ -149,8 +81,11 @@ class Sistema:
         btn_cadastrar = ttk.Button(frame, text='Cadastrar', command=self.cadastrar_funcionario)
         btn_cadastrar.place(x=10, y=60)
 
+        btn_editar = ttk.Button(frame, text='Editar')
+        btn_editar.place(x=10, y=100)
+
         btn_excluir_funcionario = ttk.Button(frame, text='Excluir', command=lambda: self.excluir_funcionario(frame))
-        btn_excluir_funcionario.place(x=10, y=100)
+        btn_excluir_funcionario.place(x=10, y=140)
 
         btn_voltar = tk.Button(frame, text='Voltar', width=12, command=lambda: frame.destroy())
         btn_voltar.place(x=10, y=210)
@@ -239,8 +174,11 @@ class Sistema:
         btn_cadastrar = ttk.Button(frame, text='Cadastrar', command=self.cadastrar_produto)
         btn_cadastrar.place(x=10, y=100)
 
+        btn_editar = ttk.Button(frame, text='Editar')
+        btn_editar.place(x=10, y=140)
+
         btn_excluir = ttk.Button(frame, text='Excluir Itens')
-        btn_excluir.place(x=10, y=140)
+        btn_excluir.place(x=10, y=180)
 
         btn_closer = tk.Button(frame, text='Close', width=13, command=frame.destroy)
         btn_closer.place(x=8, y=250)
