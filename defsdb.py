@@ -4,7 +4,7 @@ from utilitarios import *
 
 
 class BancoDados:
-    def __init__(self, nome_banco='almoxarifado.db'):
+    def __init__(self, nome_banco='test.db'):
         self.nome_banco = nome_banco
         self.conexao = None
 
@@ -80,7 +80,6 @@ class BancoDados:
                 )
             ''')
 
-            # Dentro da função criar_tabelas da classe BancoDados
             # Inserir os status iniciais
             cursor.execute('''
                 INSERT INTO status_itens (nome) VALUES ('Disponível')
@@ -211,15 +210,54 @@ class BancoDados:
         cursor.close()
         return produtos
 
+    def editar_registro(self, tabela, id, **kwargs):
+        self.conexao = sqlite3.connect(self.nome_banco)
+        if not self.conexao:
+            raise ValueError("A conexão com o banco de dados não foi estabelecida.")
+
+        try:
+            cursor = self.conexao.cursor()
+
+            # Crie uma string de consulta SQL para atualizar os campos fornecidos
+            sql = f"UPDATE {tabela} SET "
+            valores = []
+
+            for coluna, valor in kwargs.items():
+                sql += f"{coluna} = ?, "
+                valores.append(valor)
+
+            # Remova a vírgula extra no final da consulta
+            sql = sql[:-2]
+
+            # Adicione a cláusula WHERE para identificar a linha a ser atualizada
+            sql += f" WHERE id = ?"
+            valores.append(id)
+
+            # Execute a consulta SQL
+            cursor.execute(sql, tuple(valores))
+
+            # Salve as alterações
+            self.conexao.commit()
+
+            print(f"Registro na tabela {tabela} com ID {id} atualizado com sucesso.")
+
+        except sqlite3.Error as sqlite_error:
+            notificacao(f'Erro ao interagir com o SQLite: {sqlite_error}', som=2)
+        except Exception as general_error:
+            print(f'Erro geral ao atualizar o registro na tabela {tabela}: {general_error}')
+
     def setup(self):
         if not os.path.exists(self.nome_banco):
             notificacao('Banco de dados não encontrado, o Sistema criará um.')
+            self.conectar()
             self.criar_tabelas()
         self.conectar()
         self.desconectar()
 
 
-#
-if __name__ == '__main__':
-    bd = BancoDados()
-    bd.setup()
+if __name__ == "__main__":
+    banco = BancoDados()
+    banco.setup()
+
+    banco.editar_registro("itens", 1, nome='enxada', estoque=1)
+

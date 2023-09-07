@@ -27,7 +27,7 @@ class Sistema:
         self.root.geometry("1100x600")
         self.root.resizable(False, False)
         self.style = ThemedStyle(self.root)
-        self.style.theme_use("clam")
+        self.style.theme_use("winnative")
         self.root.protocol("WM_DELETE_WINDOW", self.fechar_janela)
         self.root.configure(bg="#00AAFF")
         self.banco = BancoDados()
